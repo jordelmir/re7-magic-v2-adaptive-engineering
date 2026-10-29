@@ -1,0 +1,37 @@
+# Android packages and signatures
+*.apk
+*.apk.idsig
+*.aab
+*.apks
+*.png
+*.jpg
+*.jpeg
+
+# Game and proprietary payloads
+*.dll
+*.so
+*.exe
+*.pak
+*.pck
+*.obb
+*.iso
+*.7z
+*.zip
+*.sav
+*.dat
+
+# Local reverse-engineering/build output
+decoded/
+decoded-*/
+build/
+dist/
+*.keystore
+*.jks
+*.pem
+*.p12
+*.log
+*.bugreport
+local-capture.png
+local-logcat.txt
+
+__pycache__/
