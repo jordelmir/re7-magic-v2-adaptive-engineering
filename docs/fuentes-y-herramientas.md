@@ -7,6 +7,9 @@
 - REA CLI 6.5.0: soporte para inspección y evidencia de APK/dispositivo; depende del ADB que ya tenga el operador.
 - FFmpeg: conversión puntual de recursos cuyo sufijo decía .png pero cuya firma no era PNG.
 - Android SDK Build Tools: necesarios para alinear y firmar una reconstrucción local.
+- `aapt` y `apksigner`: comprobar identificador de paquete, versión y certificado antes de instalar un clon.
+- Android NDK 28.2.13676358 y GLES/EGL: cargador nativo experimental del caso PES 6; su ejecución no quedó confirmada por logs después del último update.
+- Morphe Desktop y el bundle de patches Anddea/ReVanced Extended: receta del clon de YouTube registrada en el informe de casos. Verifica versiones nuevas antes de repetirla.
 
 REA complementa ADB; no reemplaza ni administra el transporte del dispositivo. Sus operaciones de captura y lectura pueden ser de solo lectura, mientras que instalar, iniciar, detener y desinstalar una app cambian estado. Revisa la documentación de cada operación.
 
@@ -17,6 +20,9 @@ REA complementa ADB; no reemplaza ni administra el transporte del dispositivo. S
 - [Apktool: documentación oficial](https://apktool.org/docs/)
 - [LSFG-Android: release 0.1.2](https://github.com/FrankBarretta/LSFG-Android/releases/tag/0.1.2)
 - [LSFG-Android: repositorio y README](https://github.com/FrankBarretta/LSFG-Android)
+- [Morphe Desktop: documentación CLI](https://github.com/MorpheApp/morphe-desktop/blob/main/docs/documentation.md)
+- [Anddea/ReVanced Extended: patches](https://github.com/anddea/revanced-patches)
+- [Halo 2 Android port indicado por el usuario](https://github.com/Ayanokoji989/Halo-2)
 - [Android: MediaProjection](https://developer.android.com/media/grow/media-projection)
 - [Android: hacer una app fold-aware](https://developer.android.com/develop/adaptive-apps/guides/foldables/make-your-app-fold-aware)
 

@@ -1,61 +1,47 @@
-# RE7 Android: adaptación de pantalla en Honor Magic V2
+# Elysium Vanguard Android Adaptive Engineering
 
-Caso de ingeniería para adaptar, desde un APK existente, la vista de un port de Resident Evil 7 basado en una capa de compatibilidad Android. El experimento se realizó en un Honor Magic V2 con un APK de prueba separado de la instalación original.
+Métodos reproducibles para diagnosticar y adaptar juegos, ports y reproductores de video en Android plegables. El equipo de referencia es el HONOR Magic V2, con prioridad en el panel interior desplegado.
 
-Este repositorio publica el método, un parche pequeño de bytecode Smali y la evidencia técnica descrita. **No contiene APK, juego, datos, partidas, drivers, Lossless.dll ni capturas del contenido del juego.** No está afiliado con Capcom, los autores del port, Winlator, Turnip ni Lossless Scaling.
+El repositorio reúne casos de *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube modificado y tareas relacionadas con USB y almacenamiento. Distingue entre cambios configurados, APKs instalados, comportamiento medido y resultados reportados por el usuario.
 
-## Resultado
+## Qué contiene
 
-- Se cambió la transformación de vista de **contain** a **cover**: la imagen conserva su proporción, cubre el área de dibujo y recorta el excedente centrado.
-- Se ajustó el mapeo de entrada táctil para que coincida con el recorte de pantalla completa.
-- Se reconstruyó el APK y se instaló como aplicación de prueba con identificador distinto, manteniendo instalada la original.
-- El perfil final documentado usó un contenedor de 1024×576, Turnip Gen8 V38 parcheado, DXVK 2.3.1 con límite configurado en 70, Box64 en rendimiento y FEXCore en perfil intermedio.
-- El usuario reportó después que ya ve la pantalla completa y más de 75 FPS. Esa medición final no se pudo volver a capturar por ADB: el teléfono quedó desconectado. Las capturas anteriores muestran 70 FPS en el menú inicial y 25 durante una transición de menú; por eso el reporte de >75 se conserva como resultado comunicado, no como medición reproducible de FPS reales sostenidos. Ver [resultados](docs/resultados-y-evidencia.md).
+- Un método de diagnóstico por capas para actividad, ventana, superficie, viewport, controles y contenido.
+- Procedimientos para crear clones Android firmados por separado, importar datos propios y preservar la app original.
+- Guías para mapear entrada táctil después de un cambio de escala o recorte.
+- Separación entre FPS del juego, límite configurado, refresco del panel y cuadros generados.
+- Casos de estudio en formato técnico con resultados, límites y evidencia disponible.
+- Un parche Smali acotado para el caso concreto de RE7; no es un adaptador universal.
 
-## Qué significa “solo con el APK”
+## Alcance y derechos
 
-No tuvimos el proyecto fuente Android del port. Partimos del APK, lo decodificamos con Apktool, editamos dos métodos de la capa Android representada en Smali y reconstruimos un APK de prueba. Esto cambió el escalado del lienzo y la transformación táctil. No reescribió el motor del juego ni convirtió el ejecutable de PC en código Android nativo.
+Este repositorio publica documentación y herramientas originales. **No contiene APKs, ISOs, ejecutables de juegos, saves, drivers, `Lossless.dll`, claves de firma ni capturas con contenido protegido.** Cada persona debe usar copias que tenga derecho a modificar y respetar las licencias del juego, el port y las herramientas.
 
-## Documentos
+La adaptación de escala siempre tiene un costo cuando la imagen y el panel tienen relaciones distintas: `Fit` conserva el cuadro completo y deja espacio libre; `Cover` ocupa el área pero recorta; `Stretch` ocupa el área y deforma. El método registra cuál se usó y verifica la entrada táctil por separado.
 
-- [Arquitectura y diagnóstico](docs/arquitectura-y-diagnostico.md)
+## Documentación
+
+- [Informe técnico de casos y método reproducible](skills/android-foldable-game-media/references/case-study.md)
+- [Skill para agentes de IA](skills/android-foldable-game-media/SKILL.md)
+- [Arquitectura y diagnóstico de RE7](docs/arquitectura-y-diagnostico.md)
 - [Reproducción desde un APK propio](docs/reproduccion.md)
-- [Experimentos, configuración y evidencia](docs/resultados-y-evidencia.md)
+- [Experimentos y evidencia de RE7](docs/resultados-y-evidencia.md)
 - [Evaluación de LSFG-Android](docs/generacion-de-cuadros.md)
 - [Fuentes y herramientas](docs/fuentes-y-herramientas.md)
-- [Límites y distribución](docs/distribucion-y-limites.md)
+- [Distribución y límites](docs/distribucion-y-limites.md)
 
-El parche está en [tools/patch_viewport.py](tools/patch_viewport.py). Es deliberadamente pequeño y se detiene si la estructura Smali no coincide con la esperada.
+## Caso de RE7
 
-## Gráfico del cambio
+El parche de RE7 cambia una transformación de vista de `contain` a `cover` y alinea el mapeo táctil de esa versión del port. El script [tools/patch_viewport.py](tools/patch_viewport.py) comprueba sus anclajes y se detiene si no encuentra la estructura esperada.
 
 ~~~mermaid
 flowchart LR
-    A[APK propio del port] --> B[Apktool decodifica recursos y DEX]
-    B --> C[Parche Smali: contain a cover]
-    C --> D[Parche de coordenadas táctiles]
-    D --> E[Apktool reconstruye APK]
-    E --> F[Zipalign y firma de prueba]
-    F --> G[Paquete de prueba separado]
-    G --> H[Contenedor y driver por aplicación]
-    H --> I[Capturar escena, superficie y HUD]
+    A[APK autorizado] --> B[Identificar actividad, superficie y viewport]
+    B --> C[Elegir Fit, Cover o Stretch]
+    C --> D[Aplicar cambio aislado en un clon]
+    D --> E[Transformar entrada táctil de forma coherente]
+    E --> F[Comparar la misma escena y revisar logs]
+    F --> G[Registrar evidencia y límites]
 ~~~
 
-## Reproducción rápida
-
-~~~bash
-apktool d -f --no-src "$APK_PROPIO" -o decoded
-python3 tools/patch_viewport.py decoded --apply
-apktool b decoded -o unsigned.apk
-~~~
-
-La guía completa explica firma, instalación paralela, copias de seguridad y validación. Usa solo APKs y datos que tengas derecho a modificar. Cambiar el identificador de paquete y firmar con otra llave crea una compilación distinta; no sustituye ni actualiza la app original.
-
-## Principios aprendidos
-
-1. Mide el área real de la ventana y de la superficie de render. La resolución física del panel por sí sola no identifica dónde se forman las franjas.
-2. min(escalaX, escalaY) conserva todo el cuadro y deja bandas cuando las proporciones no coinciden. max(escalaX, escalaY) llena el lienzo, pero recorta una dimensión.
-3. Si se transforma la imagen, hay que aplicar la transformación inversa a la entrada táctil.
-4. Mantén el juego, los datos y las partidas fuera del repositorio público.
-5. Un límite de FPS solo fija un techo. No prueba que el juego lo sostenga.
-6. La generación de cuadros interpola la salida mostrada; no demuestra que la simulación o el muestreo de entrada funcionen a esa frecuencia.
+Para reproducir el caso RE7, sigue [la guía específica](docs/reproduccion.md). Para los demás títulos, primero lee el informe de casos: sus loaders, datos, drivers y límites no son intercambiables.
